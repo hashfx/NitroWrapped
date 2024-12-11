@@ -8,6 +8,15 @@ query TotalTransactions($senderAddress: String!) {
   }
 }
 
+query UniqueChains($senderAddress: String!) {
+  findNitroTransactionsByFilter(
+    where: { sender_address: $senderAddress }
+  ) {
+    total
+  }
+}
+
+
 ```
 
 
