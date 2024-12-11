@@ -45,9 +45,7 @@ app.get('/nitro-wrapped/:walletAddress', async (req, res) => {
 
     const userTransactionsData = await queryGraphQL(userTransactionsQuery, { sender_address: walletAddress });
     const transactions = userTransactionsData.getUsersTransactions.data;
-
-    console.log('User Transactions Data:', transactions);
-
+    
     const summary = {
       totalTransactions: transactions.length,
       totalGasFeePaid: 0,
