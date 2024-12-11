@@ -22,9 +22,21 @@ query UniqueChains($senderAddress: String!) {
 
 
 
-###
+### Total amount received and sent
 
 ```graphQL
+query TotalAmounts($senderAddress: String!) {
+  findNitroTransactionsByFilter(
+    limit: 1000,
+    page: 1,
+    where: { sender_address: $senderAddress }
+  ) {
+    data {
+      src_amount
+      dest_amount
+    }
+  }
+}
 
 ```
 
