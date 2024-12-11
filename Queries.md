@@ -42,9 +42,21 @@ query TotalAmounts($senderAddress: String!) {
 
 
 
-###
+### Most transferred and received token
 
 ```graphQL
+query MostTransferredAndReceivedToken($senderAddress: String!) {
+  findNitroTransactionsByFilter(
+    where: { sender_address: $senderAddress }
+  ) {
+    data {
+      src_symbol
+      src_amount
+      dest_symbol
+      dest_amount
+    }
+  }
+}
 
 ```
 
