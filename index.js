@@ -2,10 +2,9 @@ const express = require('express');
 const axios = require('axios');
 
 const app = express();
-const PORT = 3000;
+const PORT = 3100;
 
-// Nitro GraphQL API endpoint
-const NITRO_API_URL = 'https://api.explorer.routernitro.com/graphql'; 
+const NITRO_API_URL = 'https://api.explorer.routernitro.com/graphql'; // Replace with the actual endpoint
 
 async function queryGraphQL(query, variables) {
   try {
@@ -15,20 +14,19 @@ async function queryGraphQL(query, variables) {
     });
     return response.data.data;
   } catch (error) {
-    console.error('GraphQL query error:', error);
-    throw new Error('Failed to fetch data from Nitro API');
+    throw new Error('Failed to fetch data from Nitro API after multiple attempts');
   }
 }
 
-// fetch required data for wrapped
+// Nitro Wrapped summary
 app.get('/nitro-wrapped/:walletAddress', async (req, res) => {
   const walletAddress = req.params.walletAddress;
 
   try {
-    // Query to fetch user's transactions
+    // fetch user's transactions
     const userTransactionsQuery = `
       query GetUsersTransactions($sender_address: String!) {
-        getUsersTransactions(sender_address: $sender_address, limit: 1000, offset: 0) {
+        getUsersTransactions(sender_address: $sender_address) {
           data {
             src_chain_id
             dest_chain_id
@@ -44,10 +42,20 @@ app.get('/nitro-wrapped/:walletAddress', async (req, res) => {
     `;
 
     const userTransactionsData = await queryGraphQL(userTransactionsQuery, { sender_address: walletAddress });
-    const transactions = userTransactionsData.getUsersTransactions.data;
+    const transactions = userTransactionsData?.getUsersTransactions?.data || [];
 
-    console.log('User Transactions Data:', userTransactionsData);
+    if (!transactions.length) {
+      return res.json({
+        totalTransactions: 0,
+        totalGasFeePaid: 0,
+        totalUniqueTokensSent: 0,
+        totalUniqueTokensReceived: 0,
+        topSourceChains: [],
+        topDestinationChains: []
+      });
+    }
 
+    // count total data
     const summary = {
       totalTransactions: transactions.length,
       totalGasFeePaid: 0,
@@ -58,27 +66,32 @@ app.get('/nitro-wrapped/:walletAddress', async (req, res) => {
     };
 
     transactions.forEach(tx => {
-      // count unique tokens
+      // unique tokens
       summary.totalUniqueTokensSent.add(tx.src_symbol);
       summary.totalUniqueTokensReceived.add(tx.dest_symbol);
 
-      // accumulate gas fee
+      // gas fee
       summary.totalGasFeePaid += parseFloat(tx.gas_fee_usd || 0);
 
-      // count source chains
+      // source chains
       summary.topSourceChains[tx.src_chain_id] = (summary.topSourceChains[tx.src_chain_id] || 0) + 1;
 
-      // count destination chains
+      // destination chains
       summary.topDestinationChains[tx.dest_chain_id] = (summary.topDestinationChains[tx.dest_chain_id] || 0) + 1;
     });
 
-    // convert Sets to counts
+    // Convert Sets to counts
     summary.totalUniqueTokensSent = summary.totalUniqueTokensSent.size;
     summary.totalUniqueTokensReceived = summary.totalUniqueTokensReceived.size;
 
     // sort chains by usage
-    summary.topSourceChains = Object.entries(summary.topSourceChains).sort((a, b) => b[1] - a[1]);
-    summary.topDestinationChains = Object.entries(summary.topDestinationChains).sort((a, b) => b[1] - a[1]);
+    summary.topSourceChains = Object.entries(summary.topSourceChains)
+      .map(([chain, count]) => ({ chain, count }))
+      .sort((a, b) => b.count - a.count);
+
+    summary.topDestinationChains = Object.entries(summary.topDestinationChains)
+      .map(([chain, count]) => ({ chain, count }))
+      .sort((a, b) => b.count - a.count);
 
     res.json(summary);
   } catch (error) {
@@ -86,7 +99,6 @@ app.get('/nitro-wrapped/:walletAddress', async (req, res) => {
   }
 });
 
-// Start the server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
