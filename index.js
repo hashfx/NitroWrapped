@@ -2,7 +2,7 @@ const express = require('express');
 const axios = require('axios');
 
 const app = express();
-const PORT = 3100;
+const PORT = 3000;
 
 const NITRO_API_URL = 'https://api.explorer.routernitro.com/graphql';
 
