@@ -12,3 +12,7 @@ Your entire transaction story, wrapped up!
 |:--:|:--:|
 |API|GraphQL|
 |Framework|ExpressJS|
+
+### Walkthrough
++ run the app: ```node index.js```
++ in the address bar, type URL with ```/nitro-wrapped/WALLET-ADDRESS```
