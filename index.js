@@ -73,7 +73,7 @@ app.get('/nitro-wrapped/:walletAddress', async (req, res) => {
       // gas fee
       summary.totalGasFeePaid += parseFloat(tx.gas_fee_usd || 0);
 
-      // gource chains
+      // source chains
       summary.topSourceChains[tx.src_chain_id] = (summary.topSourceChains[tx.src_chain_id] || 0) + 1;
 
       // destination chains
