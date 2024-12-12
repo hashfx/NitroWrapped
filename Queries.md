@@ -62,6 +62,27 @@ query MostTransferredAndReceivedToken($senderAddress: String!) {
 
 
 
+### All transactions information of user
+
+```graphQL
+query GetUsersTransactions($sender_address: String!) {
+  getUsersTransactions(sender_address: $sender_address) {
+    data {
+      src_chain_id
+      dest_chain_id
+      src_symbol
+      dest_symbol
+      fee_amount
+      src_amount
+      dest_amount
+      gas_fee_usd
+    }
+  }
+}
+```
+
+<!-- 
+
 ###
 
 ```graphQL
@@ -78,17 +99,11 @@ query MostTransferredAndReceivedToken($senderAddress: String!) {
 
 
 
-###
-
-```graphQL
-
-```
-
-
-
 
 ###
 
 ```graphQL
 
 ```
+
+-->
