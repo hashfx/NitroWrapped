@@ -53,6 +53,7 @@ app.get('/nitro-wrapped/:walletAddress', async (req, res) => {
       totalUniqueTokensReceived: new Set(),
       topSourceChains: {},
       topDestinationChains: {},
+      mostUsedToken: "",
     };
 
     transactions.forEach(tx => {
