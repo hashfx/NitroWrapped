@@ -1,10 +1,19 @@
 const express = require('express');
 const axios = require('axios');
+const cors = require('cors');
 
 const app = express();
-const PORT = 3000;
+const PORT = 3200;
 
 const NITRO_API_URL = 'https://api.explorer.routernitro.com/graphql';
+
+const corsOptions = {
+  origin: 'https://3000-hashfx-nitrowrapped-j7sp7hql4vg.ws-us117.gitpod.io', // Frontend URL
+  methods: ['GET', 'POST'], // Allowed HTTP methods
+  credentials: true, // Allow cookies and headers
+};
+
+app.use(cors(corsOptions));
 
 async function queryGraphQL(query, variables) {
   try {
