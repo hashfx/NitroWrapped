@@ -75,6 +75,7 @@ app.get('/nitro-wrapped/:walletAddress', async (req, res) => {
         topSourceChains: [],
         topDestinationChains: [],
         mostUsedToken: null,
+        highestFeeTransaction: null,
       });
     }
 
@@ -86,6 +87,7 @@ app.get('/nitro-wrapped/:walletAddress', async (req, res) => {
       topSourceChains: {},
       topDestinationChains: {},
       tokenUsage: {},
+      highestFeeTransaction: { feeAmount: 0, feeToken: "", transactionHash: "" },
     };
 
     transactions.forEach(tx => {
@@ -109,6 +111,23 @@ app.get('/nitro-wrapped/:walletAddress', async (req, res) => {
       if (tx.dest_symbol) {
         summary.tokenUsage[tx.dest_symbol] = (summary.tokenUsage[tx.dest_symbol] || 0) + 1;
       }
+
+      // calculate total fee and highest fee paid transaction
+      const gasFee = parseFloat(tx.gas_fee_usd || 0);
+      const bridgeFee = parseFloat(tx.bridge_fee_usd || 0);
+      const sysFee = parseFloat(tx.sys_fee || 0);
+      const partnerFee = parseFloat(tx.partner_fee || 0);
+      const forwarderFee = parseFloat(tx.forwarder_fee || 0);
+      const totalFee = gasFee + bridgeFee + sysFee + partnerFee + forwarderFee;
+
+      if (totalFee > summary.highestFeeTransaction.feeAmount) {
+        summary.highestFeeTransaction = {
+          feeAmount: totalFee,
+          feeToken: tx.native_token_symbol || "Unknown",
+          transactionHash: tx.src_tx_hash || tx.dest_tx_hash || "Unknown",
+        };
+      }
+
     });
 
     // convert Sets to counts
