@@ -100,6 +100,7 @@ app.get('/nitro-wrapped/:walletAddress', async (req, res) => {
     };
 
     let transactionCountWithTime = 0;
+    let minTransactionTime = Number.MAX_VALUE;
 
     transactions.forEach(tx => {
       // unique tokens
@@ -157,6 +158,9 @@ app.get('/nitro-wrapped/:walletAddress', async (req, res) => {
         if (timeSpent > summary.maxTransactionTime) {
           summary.maxTransactionTime = timeSpent;
         }
+        if (timeSpent < minTransactionTime) {
+          minTransactionTime = timeSpent;
+        }
       }
 
     });
@@ -201,6 +205,9 @@ app.get('/nitro-wrapped/:walletAddress', async (req, res) => {
     // average transaction time
     summary.averageTransactionTime =
       transactionCountWithTime > 0 ? summary.totalTransactionTime / transactionCountWithTime : 0;
+
+    summary.minimumTransactionTime = transactionCountWithTime > 0 ? minTransactionTime : 0;
+
 
     res.json(summary);
   } catch (error) {
