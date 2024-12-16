@@ -135,6 +135,9 @@ app.get('/nitro-wrapped/:walletAddress', async (req, res) => {
       const forwarderFee = parseFloat(tx.forwarder_fee || 0);
       const totalFee = gasFee + bridgeFee + sysFee + partnerFee + forwarderFee;
 
+      // total fee paid
+      summary.totalGasFeePaid = (summary.totalGasFeePaid || 0) + totalFee;
+
       if (totalFee > summary.highestFeeTransaction.feeAmount) {
         summary.highestFeeTransaction = {
           feeAmount: totalFee,
