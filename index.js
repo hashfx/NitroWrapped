@@ -72,10 +72,15 @@ app.get('/nitro-wrapped/:walletAddress', async (req, res) => {
         totalGasFeePaid: 0,
         totalUniqueTokensSent: 0,
         totalUniqueTokensReceived: 0,
+        totalTokensSent: 0,
+        totalTokensReceived: 0,
         topSourceChains: [],
         topDestinationChains: [],
         mostUsedToken: null,
         highestFeeTransaction: null,
+        averageTransactionTime: 0,
+        maxTransactionTime: 0,
+        totalTransactionTime: 0,
       });
     }
 
@@ -84,11 +89,17 @@ app.get('/nitro-wrapped/:walletAddress', async (req, res) => {
       totalGasFeePaid: 0,
       totalUniqueTokensSent: new Set(),
       totalUniqueTokensReceived: new Set(),
+      totalTokensSent: 0,
+      totalTokensReceived: 0,
       topSourceChains: {},
       topDestinationChains: {},
       tokenUsage: {},
       highestFeeTransaction: { feeAmount: 0, feeToken: "", transactionHash: "" },
+      totalTransactionTime: 0,
+      maxTransactionTime: 0,
     };
+
+    let transactionCountWithTime = 0;
 
     transactions.forEach(tx => {
       // unique tokens
@@ -112,6 +123,10 @@ app.get('/nitro-wrapped/:walletAddress', async (req, res) => {
         summary.tokenUsage[tx.dest_symbol] = (summary.tokenUsage[tx.dest_symbol] || 0) + 1;
       }
 
+      // calculate value of total amount sent and received
+      summary.totalTokensSent += parseFloat(tx.src_amount || 0) + parseFloat(tx.src_stable_amount || 0);
+      summary.totalTokensReceived += parseFloat(tx.dest_amount || 0) + parseFloat(tx.dest_stable_amount || 0);
+
       // calculate total fee and highest fee paid transaction
       const gasFee = parseFloat(tx.gas_fee_usd || 0);
       const bridgeFee = parseFloat(tx.bridge_fee_usd || 0);
@@ -126,6 +141,19 @@ app.get('/nitro-wrapped/:walletAddress', async (req, res) => {
           feeToken: tx.native_token_symbol || "Unknown",
           transactionHash: tx.src_tx_hash || tx.dest_tx_hash || "Unknown",
         };
+      }
+
+      // transaction time calculations
+      const srcTimestamp = tx.src_timestamp ? parseFloat(tx.src_timestamp) : 0;
+      const destTimestamp = tx.dest_timestamp ? parseFloat(tx.dest_timestamp) : 0;
+      const timeSpent = destTimestamp - srcTimestamp;
+
+      if (timeSpent > 0) {
+        summary.totalTransactionTime += timeSpent;
+        transactionCountWithTime++;
+        if (timeSpent > summary.maxTransactionTime) {
+          summary.maxTransactionTime = timeSpent;
+        }
       }
 
     });
@@ -166,6 +194,10 @@ app.get('/nitro-wrapped/:walletAddress', async (req, res) => {
       .sort((a, b) => b[1] - a[1])[0];
 
     summary.mostUsedToken = mostUsedToken ? { name: mostUsedToken[0], count: mostUsedToken[1] } : null;
+
+    // average transaction time
+    summary.averageTransactionTime =
+      transactionCountWithTime > 0 ? summary.totalTransactionTime / transactionCountWithTime : 0;
 
     res.json(summary);
   } catch (error) {
