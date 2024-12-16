@@ -52,23 +52,37 @@ function App() {
               <strong>Total Transactions:</strong> {data.totalTransactions || 0}
             </li>
             <li>
-              <strong>Total Bridge Fee Paid:</strong> {data.totalBridgeFeePaid ? data.totalBridgeFeePaid.toFixed(2) : '0.00'} USD
+              <strong>Total Gas Fee Paid:</strong> {data.totalGasFeePaid ? data.totalGasFeePaid.toFixed(2) : '0.00'} USD
             </li>
             <li>
-              <strong>Most Used Token:</strong>
-              {data.mostUsedToken ? `${data.mostUsedToken.name} (${data.mostUsedToken.count})` : 'N/A'}
+              <strong>Total Unique Tokens Sent:</strong> {data.totalUniqueTokensSent || 0}
             </li>
             <li>
-              <strong>Top Bridge Fee Token:</strong>
-              {data.topBridgeFeeToken
-                ? `${data.topBridgeFeeToken.name} ($${data.topBridgeFeeToken.amount.toFixed(2)})`
-                : 'N/A'}
+              <strong>Total Unique Tokens Received:</strong> {data.totalUniqueTokensReceived || 0}
             </li>
             <li>
-              <strong>Transaction with Highest Value:</strong>
-              {data.transactionWithHighestValue
-                ? `${data.transactionWithHighestValue.amount.toFixed(2)} ${data.transactionWithHighestValue.token}`
-                : 'N/A'}
+              <strong>Total Tokens Sent:</strong> {data.totalTokensSent ? data.totalTokensSent.toFixed(2) : '0.00'}
+            </li>
+            <li>
+              <strong>Total Tokens Received:</strong> {data.totalTokensReceived ? data.totalTokensReceived.toFixed(2) : '0.00'}
+            </li>
+            <li>
+              <strong>Token Usage:</strong>
+              {data.tokenUsage && Object.entries(data.tokenUsage).map(([token, count]) => (
+                <div key={token}>
+                  {token}: {count}
+                </div>
+              ))}
+            </li>
+            <li>
+              <strong>Highest Fee Transaction:</strong>
+              {data.highestFeeTransaction ? `${data.highestFeeTransaction.feeAmount} ${data.highestFeeTransaction.feeToken} (Hash: ${data.highestFeeTransaction.transactionHash})` : 'N/A'}
+            </li>
+            <li>
+              <strong>Total Transaction Time:</strong> {data.totalTransactionTime || 0} seconds
+            </li>
+            <li>
+              <strong>Max Transaction Time:</strong> {data.maxTransactionTime || 0} seconds
             </li>
             <li>
               <strong>Top Source Chain:</strong>
@@ -81,6 +95,13 @@ function App() {
               {data.topDestinationChainCount
                 ? `${data.topDestinationChainCount.chain} (${data.topDestinationChainCount.count})`
                 : 'N/A'}
+            </li>
+            <li>
+              <strong>Most Used Token:</strong>
+              {data.mostUsedToken ? `${data.mostUsedToken.name} (${data.mostUsedToken.count})` : 'N/A'}
+            </li>
+            <li>
+              <strong>Average Transaction Time:</strong> {data.averageTransactionTime || 0} seconds
             </li>
           </ul>
         </div>
