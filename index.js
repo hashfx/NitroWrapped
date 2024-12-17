@@ -90,7 +90,9 @@ app.get('/nitro-wrapped/:walletAddress', async (req, res) => {
       totalUniqueTokensSent: new Set(),
       totalUniqueTokensReceived: new Set(),
       totalTokensSent: 0,
+      totalTokensSentByToken: {},
       totalTokensReceived: 0,
+      totalTokensReceivedByToken: {},
       topSourceChains: {},
       topDestinationChains: {},
       tokenUsage: {},
@@ -127,6 +129,18 @@ app.get('/nitro-wrapped/:walletAddress', async (req, res) => {
       // calculate value of total amount sent and received
       summary.totalTokensSent += parseFloat(tx.src_amount || 0) + parseFloat(tx.src_stable_amount || 0);
       summary.totalTokensReceived += parseFloat(tx.dest_amount || 0) + parseFloat(tx.dest_stable_amount || 0);
+
+      // aggregate tokens sent amount with name
+      if (tx.src_symbol) {
+        summary.totalTokensSentByToken[tx.src_symbol] = (summary.totalTokensSentByToken[tx.src_symbol] || 0) +
+        parseFloat(tx.src_amount || 0) + parseFloat(tx.src_stable_amount || 0);
+      }
+      
+      // aggregate tokens received amount with name
+      if (tx.dest_symbol) {
+        summary.totalTokensReceivedByToken[tx.dest_symbol] = (summary.totalTokensReceivedByToken[tx.dest_symbol] || 0) +
+          parseFloat(tx.dest_amount || 0) + parseFloat(tx.dest_stable_amount || 0);
+      }
 
       // calculate total fee and highest fee paid transaction
       const gasFee = parseFloat(tx.gas_fee_usd || 0);
