@@ -8,7 +8,7 @@ const PORT = 3200;
 const NITRO_API_URL = 'https://api.explorer.routernitro.com/graphql';
 
 const corsOptions = {
-  origin: 'https://3000-hashfx-nitrowrapped-j7sp7hql4vg.ws-us117.gitpod.io', // Frontend URL
+  origin: 'http://localhost:3000', // Frontend URL
   methods: ['GET', 'POST'], // Allowed HTTP methods
   credentials: true, // Allow cookies and headers
 };
