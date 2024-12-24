@@ -14,5 +14,11 @@ Your entire transaction story, wrapped up!
 |Framework|ExpressJS|
 
 ### Walkthrough
-+ run the app: ```node index.js```
-+ in the address bar, type URL with ```/nitro-wrapped/WALLET-ADDRESS```
++ install dependencies
+    ```npm install```
+    ```cd frontend/```
+    ```npm install```
++ run the backend: ```node index.js```
++ to test backend: ```http://localhost:3200/nitro-wrapped/<WALLET-ADDRESS>```
++ to launch the frontend: ```http://localhost:3000/```
++ input the user wallet address and enjoy Nitro Wrapped!
